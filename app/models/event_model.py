@@ -23,10 +23,10 @@ class EventModel(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # 1 user - N event (owner)
-    owner = relationship("EventModel", back_populates="owner_events", foreign_keys=[owner_id])
+    owner = relationship("UserModel", back_populates="owner_events", foreign_keys=[owner_id])
 
     # N user - N event
-    staffs = relationship("UserModel", secondary="event_staff", back_populates="events")
+    staffs = relationship("UserModel", secondary=event_staff, back_populates="events")
 
     # 1 event - N event tasks
     event_tasks = relationship("EventTaskModel", back_populates="event")

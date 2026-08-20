@@ -16,7 +16,8 @@ class EventTaskModel(Base):
     status = Column(String(255), nullable=False)
     priority = Column(String(255), nullable=False)
     due_date = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(
+        timezone.utc), nullable=False)
 
     # 1 event - N event tasks
     event = relationship("EventModel", back_populates="event_tasks")
