@@ -3,9 +3,6 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Event management"
-    APP_VERSION: str = "1.0.0"
-
     DATABASE_URL: str
 
     SECRET_KEY: str
