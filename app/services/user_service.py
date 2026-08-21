@@ -1,7 +1,8 @@
+from app.core.security import verify_password, create_access_token
 from sqlalchemy.orm import Session
 import app.schemas.user_schema as user_schema
 from app.models.user_model import UserModel
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from app.core.security import hash_password
 
 
@@ -22,3 +23,27 @@ def create_user(db: Session, user: user_schema.UserCreate):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+def authenticate_user(db: Session, user: user_schema.UserLogin) -> dict:
+    user_data = db.query(UserModel).filter(UserModel.email == user.email).first()
+
+    if not user_data or not verify_password(user.password, user_data.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email hoặc mật khẩu không chính xác",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not user_data.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tài khoản đã bị tạm khóa"
+        )
+
+    access_token = create_access_token(data={"sub": user_data.email, "role": user_data.role})
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }

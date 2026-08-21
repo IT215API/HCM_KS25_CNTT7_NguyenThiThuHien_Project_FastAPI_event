@@ -10,6 +10,11 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
 class UserUpdate(BaseModel):
     email: str | None = None
     full_name: str | None = None
@@ -25,3 +30,8 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes=True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
