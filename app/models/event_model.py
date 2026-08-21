@@ -4,14 +4,6 @@ from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Tabl
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
-event_staff = Table(
-    "event_staff",
-    Base.metadata,
-    Column("event_id", Integer, ForeignKey("events.id"), primary_key=True),
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("role", String(255), nullable=False),
-    Column("joined_at", DateTime,  default=lambda: datetime.now(timezone.utc))
-)
 
 class EventModel(Base):
     __tablename__ = "events"
@@ -20,14 +12,13 @@ class EventModel(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
-    # 1 user - N event (owner)
-    owner = relationship("UserModel", back_populates="owner_events", foreign_keys=[owner_id])
+    # 1 user - N event owner
+    user = relationship("UserModel", back_populates="owner_events")
 
-    # N user - N event
-    staffs = relationship("UserModel", secondary=event_staff, back_populates="events")
-
-    # 1 event - N event tasks
+    # 1 event - N event task
     event_tasks = relationship("EventTaskModel", back_populates="event")
 
+    # 1 event - N event staff
+    event_staffs = relationship("EventStaffModel", back_populates="event")

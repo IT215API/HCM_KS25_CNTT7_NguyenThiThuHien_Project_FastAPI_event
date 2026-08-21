@@ -3,7 +3,7 @@ from datetime import datetime
 
 class UserBase(BaseModel):
    email: str
-   full_name: str | None = None
+   full_name: str
 
 
 class UserCreate(UserBase):
@@ -18,7 +18,7 @@ class UserUpdate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: str
-    full_name: str | None
+    full_name: str
     role: str
     is_active: bool
     created_at: datetime
