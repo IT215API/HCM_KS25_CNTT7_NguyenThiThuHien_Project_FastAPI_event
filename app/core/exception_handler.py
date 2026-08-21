@@ -10,7 +10,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=422,
         content=APIResponse(
             statusCode=422,
-            message="Dữ liệu không hợp lệ",
+            message="Dữ liệu truyền vào không hợp lệ",
             data=None,
             error=exc.errors(),
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -38,7 +38,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content=APIResponse(
             statusCode=500,
-            message="Hệ thống gặp sự cố",
+            message="Hệ thống gặp sự cố, vui lòng thử lại sau",
             data=None,
             error=str(exc),
             timestamp=datetime.now(timezone.utc).isoformat(),
