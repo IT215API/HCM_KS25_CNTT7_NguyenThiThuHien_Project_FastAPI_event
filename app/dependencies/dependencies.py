@@ -10,10 +10,7 @@ from app.core.config import settings
 reusable_oauth2 = HTTPBearer()
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(reusable_oauth2),
-    db: Session = Depends(get_db)
-) -> UserModel:
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(reusable_oauth2), db: Session = Depends(get_db)) -> UserModel:
     token = credentials.credentials
 
     credentials_exception = HTTPException(
