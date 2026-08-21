@@ -47,3 +47,17 @@ def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
         message="Đăng nhập thành công",
         request=request
     )
+
+
+@router.get("/me")
+def get_current_user_profile(
+    request: Request,
+    current_user: UserModel = Depends(get_current_user)
+):
+    user_data = UserResponse.model_validate(current_user)
+
+    return success_response(
+        data=user_data,
+        message="Lấy thông tin tài khoản thành công",
+        request=request
+    )
