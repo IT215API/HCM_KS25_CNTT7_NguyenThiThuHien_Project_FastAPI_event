@@ -4,13 +4,17 @@ from app.db.database import engine, Base
 import app.models.event_model
 import app.models.event_task
 import app.models.user_model
+import app.models.event_staff
 from app.core.exception_handler import http_exception_handler, validation_exception_handler, global_exception_handler
 from fastapi.exceptions import RequestValidationError
+from app.routers import users_router
 
 
 app = FastAPI(
     title="Event Management Fastapi"
 )
+
+app.include_router(users_router.router)
 
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)

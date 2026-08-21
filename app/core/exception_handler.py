@@ -13,7 +13,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             message="Dữ liệu không hợp lệ",
             data=None,
             error=exc.errors(),
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             path=request.url.path
         ).model_dump()
     )
@@ -27,7 +27,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             message=exc.detail,
             data=None,
             error=exc.detail,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             path=request.url.path
         ).model_dump()
     )
@@ -41,7 +41,7 @@ async def global_exception_handler(request: Request, exc: Exception):
             message="Hệ thống gặp sự cố",
             data=None,
             error=str(exc),
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             path=request.url.path
         ).model_dump()
     )

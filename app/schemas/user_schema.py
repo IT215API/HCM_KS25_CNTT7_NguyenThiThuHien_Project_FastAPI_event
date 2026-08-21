@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 class UserBase(BaseModel):
-   email: str
+   email: EmailStr
    full_name: str
 
 
