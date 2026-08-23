@@ -26,17 +26,6 @@ def register_user(request: Request, user_data: UserCreate, db: Session = Depends
     )
 
 
-@router.get("/users")
-def get_all_users_for_admin(
-    request: Request,
-    current_user: UserModel = Depends(RoleChecker(["Admin"]))
-):
-    return success_response(
-        data={"message": f"Welcome Admin {current_user.full_name}"},
-        message="Truy cập danh sách người dùng thành công",
-        request=request
-    )
-
 
 @router.post("/login")
 def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):

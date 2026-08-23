@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, status
+# from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from sqlalchemy.orm import Session
@@ -8,6 +9,7 @@ from app.core.config import settings
 
 
 reusable_oauth2 = HTTPBearer()
+# reusable_oauth2 = OAuth2PasswordBearer()
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(reusable_oauth2), db: Session = Depends(get_db)) -> UserModel:
