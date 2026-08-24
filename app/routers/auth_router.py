@@ -28,35 +28,17 @@ def register_user(request: Request, user_data: UserCreate, db: Session = Depends
 
 
 
-# @router.post("/login")
-# def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
-#     token_data = user_service.authenticate_user(db, user)
-
-#     return success_response(
-#         data=token_data,
-#         message="Đăng nhập thành công",
-#         request=request
-#     )
-
 @router.post("/login")
-def login(
-    request: Request,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
+def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
     token_data = user_service.authenticate_user(
-        db,
-        email=form_data.username,
-        password=form_data.password
+        db, 
+        email=user.email,
+        password=user.password
     )
 
-    # return success_response(
-    #     data=token_data,
-    #     message="Đăng nhập thành công",
-    #     request=request
-    # )
-    return user_service.authenticate_user(
-        db=db,
-        email=form_data.username,
-        password=form_data.password
+    return success_response(
+        data=token_data,
+        message="Đăng nhập thành công",
+        request=request
     )
+
