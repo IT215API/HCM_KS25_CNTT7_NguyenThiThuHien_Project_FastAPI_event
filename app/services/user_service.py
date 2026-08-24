@@ -27,10 +27,10 @@ def create_user(db: Session, user: user_schema.UserCreate):
     return new_user
 
 
-def authenticate_user(db: Session, user: user_schema.UserLogin) -> dict:
-    user_data = db.query(UserModel).filter(UserModel.email == user.email).first()
+def authenticate_user(db: Session, email: str, password: str) -> dict:
+    user_data = db.query(UserModel).filter(UserModel.email == email).first()
 
-    if not user_data or not verify_password(user.password, user_data.password_hash):
+    if not user_data or not verify_password(password, user_data.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email hoặc mật khẩu không chính xác",
