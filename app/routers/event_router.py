@@ -46,3 +46,21 @@ def get_user_events(
         data=event_list,
         message="Lấy danh sách sự kiện thành công"
     )
+
+
+@router.get("/{event_id}", status_code=200)
+def get_event_by_id(
+    event_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    event = event_service.get_event_by_id(db, event_id, current_user)
+
+    event_data = EventResponse.model_validate(event).model_dump()
+
+    return success_response(
+        request=request,
+        data=event_data,
+        message="Lấy thông tin chi tiết sự kiện thành công"
+    )

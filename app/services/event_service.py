@@ -55,7 +55,10 @@ def create_event(
     return new_event
 
 
-def get_user_events(db: Session, current_user, search: str | None = None):
+def get_user_events(
+    db: Session, 
+    current_user, search: str | None = None
+):
     query_user = (
         db.query(EventModel)
         .join(EventStaffModel, EventModel.id == EventStaffModel.event_id)
@@ -68,3 +71,30 @@ def get_user_events(db: Session, current_user, search: str | None = None):
             query_user = query_user.filter(EventModel.name.ilike(f"%{search_clean}%"))
 
     return query_user.all()
+
+
+def get_event_by_id(
+    db: Session, 
+    event_id: int, 
+    current_user
+):
+    event = db.query(EventModel).filter(EventModel.id == event_id).first()
+    if not event:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy sự kiện"
+        )
+
+    member = (
+        db.query(EventStaffModel)
+        .filter(EventStaffModel.event_id == event_id, EventStaffModel.user_id == current_user.id)
+        .first()
+    )
+
+    if not member:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Bạn không có quyền truy cập sự kiện này"
+        )
+
+    return event
