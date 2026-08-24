@@ -28,4 +28,21 @@ def create_event(
         message="Tạo sự kiện thành công",
         request=request
     )
-    
+
+
+@router.get("", status_code=200)
+def get_user_events(
+    request: Request,
+    search: str | None = None,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    events = event_service.get_user_events(db, current_user, search)
+
+    event_list = [EventResponse.model_validate(e).model_dump() for e in events]
+
+    return success_response(
+        request=request,
+        data=event_list,
+        message="Lấy danh sách sự kiện thành công"
+    )

@@ -6,6 +6,7 @@ from app.dependencies.dependencies import get_current_user
 from app.models.event_model import EventModel
 from app.schemas.api_schema import success_response
 from app.models.user_model import UserModel
+from app.models.event_staff import EventStaffModel
 
 
 def create_event(
@@ -43,4 +44,27 @@ def create_event(
     db.commit()
     db.refresh(new_event)
 
+    staff_member = EventStaffModel(
+        event_id=new_event.id,
+        user_id=current_user.id,
+        role="OWNER"
+    )
+    db.add(staff_member)
+    db.commit()
+
     return new_event
+
+
+def get_user_events(db: Session, current_user, search: str | None = None):
+    query_user = (
+        db.query(EventModel)
+        .join(EventStaffModel, EventModel.id == EventStaffModel.event_id)
+        .filter(EventStaffModel.user_id == current_user.id)
+    )
+
+    if search is not None:
+        search_clean = search.strip()
+        if search_clean:
+            query_user = query_user.filter(EventModel.name.ilike(f"%{search_clean}%"))
+
+    return query_user.all()
