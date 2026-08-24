@@ -7,6 +7,8 @@ from app.db.database import get_db
 from app.schemas.api_schema import success_response
 from app.dependencies.dependencies import get_current_user
 from app.schemas.event_schema import EventUpdate
+from app.schemas.event_staff_schema import EventMemberResponse
+import app.services.member_service as member_service
 
 
 router = APIRouter(
@@ -107,4 +109,26 @@ def delete_event_owner(
         request=request,
         data=deleted_event_data,
         message="Xóa sự kiện thành công"
+    )
+
+
+@router.get("/{event_id}/members", status_code=200)
+def get_event_members(
+    event_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    members = member_service.get_event_members(
+        db=db,
+        event_id=event_id,
+        current_user=current_user
+    )
+
+    members_data = [EventMemberResponse.model_validate(m).model_dump()for m in members]
+
+    return success_response(
+        request=request,
+        data=members_data,
+        message="Lấy danh sách thành viên thành công"
     )
