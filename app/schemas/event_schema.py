@@ -8,7 +8,7 @@ class EventBase(BaseModel):
 
 
 class EventCreate(EventBase):
-    owner_id: int
+    pass
 
 
 class EventUpdate(EventBase):

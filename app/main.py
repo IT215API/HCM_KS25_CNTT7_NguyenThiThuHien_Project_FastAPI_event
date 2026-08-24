@@ -7,7 +7,7 @@ import app.models.user_model
 import app.models.event_staff
 from app.core.exception_handler import http_exception_handler, validation_exception_handler, global_exception_handler
 from fastapi.exceptions import RequestValidationError
-from app.routers import users_router, auth_router
+from app.routers import users_router, auth_router, event_router
 
 
 app = FastAPI(
@@ -16,6 +16,7 @@ app = FastAPI(
 
 app.include_router(auth_router.router)
 app.include_router(users_router.router)
+app.include_router(event_router.router)
 
 
 app.add_exception_handler(HTTPException, http_exception_handler)
