@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status
 from app.schemas.event_schema import EventCreate
 from app.db.database import get_db
 from sqlalchemy.orm import Session
 from app.dependencies.dependencies import get_current_user
 from app.models.event_model import EventModel
-from app.schemas.api_schema import success_response
 from app.models.user_model import UserModel
 from app.models.event_staff import EventStaffModel
+from app.schemas.event_schema import EventUpdate
 
 
 def create_event(
@@ -97,4 +97,34 @@ def get_event_by_id(
             detail="Bạn không có quyền truy cập sự kiện này"
         )
 
+    return event
+
+
+
+def update_event_owner(
+    db: Session,
+    event_id: int, 
+    event_in: EventUpdate, 
+    current_user
+):
+    event = db.query(EventModel).filter(EventModel.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Không tìm thấy sự kiện")
+
+    if event.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="Chỉ có Owner mới có quyền cập nhật")
+
+    if event_in.name is not None:
+        clean_name = event_in.name.strip()
+        if not clean_name:
+            raise HTTPException(
+                status_code=400, detail="Tên sự kiện không được để trống")
+        event.name = clean_name
+
+    if event_in.description:
+        event.description = event_in.description.strip()
+
+    db.commit()
+    db.refresh(event)
     return event

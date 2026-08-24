@@ -30,7 +30,7 @@ def get_current_user_profile(
     )
 
 
-@router.get("", response_model=None)
+@router.get("")
 def get_all_users(
     request: Request,
     search: Optional[str] = Query(None, description="Tìm kiếm theo tên hoặc email"),

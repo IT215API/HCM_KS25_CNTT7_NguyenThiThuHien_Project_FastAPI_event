@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.schemas.api_schema import success_response
 from app.dependencies.dependencies import get_current_user
+from app.schemas.event_schema import EventUpdate
 
 
 router = APIRouter(
@@ -63,4 +64,28 @@ def get_event_by_id(
         request=request,
         data=event_data,
         message="Lấy thông tin chi tiết sự kiện thành công"
+    )
+
+
+@router.patch("/{event_id}", status_code=200)
+def update_event_owner(
+    event_id: int,
+    event_in: EventUpdate,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    updated_event = event_service.update_event_owner(
+        db=db,
+        event_id=event_id,
+        event_in=event_in,
+        current_user=current_user
+    )
+
+    event_data = EventResponse.model_validate(updated_event).model_dump()
+
+    return success_response(
+        request=request,
+        data=event_data,
+        message="Cập nhật sự kiện thành công"
     )
