@@ -6,7 +6,7 @@ from app.dependencies.dependencies import get_current_user
 from app.models.event_model import EventModel
 from app.models.user_model import UserModel
 from app.models.event_staff import EventStaffModel
-from app.schemas.event_schema import EventUpdate
+from app.schemas.event_schema import EventUpdate, EventResponse
 
 
 def create_event(
@@ -128,3 +128,24 @@ def update_event_owner(
     db.commit()
     db.refresh(event)
     return event
+
+
+def delete_event_owner(
+    db: Session,
+    event_id: int,
+    current_user
+):
+    event = db.query(EventModel).filter(EventModel.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Không tìm thấy sự kiện")
+
+    if event.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="Chỉ có Owner mới có quyền xóa")
+
+    event_data = EventResponse.model_validate(event).model_dump()
+
+    db.delete(event)
+    db.commit()
+
+    return event_data

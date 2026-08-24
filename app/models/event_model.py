@@ -21,4 +21,4 @@ class EventModel(Base):
     event_tasks = relationship("EventTaskModel", back_populates="event")
 
     # 1 event - N event staff
-    event_staffs = relationship("EventStaffModel", back_populates="event")
+    event_staffs = relationship("EventStaffModel", back_populates="event", cascade="all, delete-orphan")

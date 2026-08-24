@@ -89,3 +89,22 @@ def update_event_owner(
         data=event_data,
         message="Cập nhật sự kiện thành công"
     )
+
+@router.delete("/{event_id}", status_code=200)
+def delete_event_owner(
+    event_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    deleted_event_data = event_service.delete_event_owner(
+        db=db,
+        event_id=event_id,
+        current_user=current_user
+    )
+
+    return success_response(
+        request=request,
+        data=deleted_event_data,
+        message="Xóa sự kiện thành công"
+    )
