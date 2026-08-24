@@ -5,7 +5,10 @@ from datetime import datetime, timezone
 from app.schemas.api_schema import APIResponse
 
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(
+    request: Request, 
+    exc: RequestValidationError
+):
     return JSONResponse(
         status_code=422,
         content=APIResponse(
@@ -19,7 +22,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-async def http_exception_handler(request: Request, exc: HTTPException):
+async def http_exception_handler(
+    request: Request, 
+    exc: HTTPException
+):
     return JSONResponse(
         status_code=exc.status_code,
         content=APIResponse(
@@ -33,7 +39,10 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
-async def global_exception_handler(request: Request, exc: Exception):
+async def global_exception_handler(
+    request: Request, 
+    exc: Exception
+):
     return JSONResponse(
         status_code=500,
         content=APIResponse(

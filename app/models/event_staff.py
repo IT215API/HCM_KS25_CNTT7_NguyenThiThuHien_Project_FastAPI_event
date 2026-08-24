@@ -4,9 +4,11 @@ from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 import enum
 
+
 class Role(str, enum.Enum):
     OWNER = "owner"
     MEMBER = "member"
+
 
 class EventStaffModel(Base):
     __tablename__ = "event_staffs"

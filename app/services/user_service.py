@@ -6,9 +6,13 @@ from fastapi import HTTPException, status
 from app.core.security import hash_password
 from typing import Optional
 from sqlalchemy import or_
+from fastapi import Request
 
 
-def create_user(db: Session, user: user_schema.UserCreate):
+def create_user(
+        db: Session, 
+        user: user_schema.UserCreate
+):
     user_data = db.query(UserModel).filter(UserModel.email == user.email).first()
 
     if user_data:
@@ -27,7 +31,11 @@ def create_user(db: Session, user: user_schema.UserCreate):
     return new_user
 
 
-def authenticate_user(db: Session, email: str, password: str) -> dict:
+def authenticate_user(
+        db: Session, 
+        email: str, 
+        password: str,
+) -> dict:
     user_data = db.query(UserModel).filter(UserModel.email == email).first()
 
     if not user_data or not verify_password(password, user_data.password_hash):
@@ -46,6 +54,7 @@ def authenticate_user(db: Session, email: str, password: str) -> dict:
     access_token = create_access_token(data={"sub": user_data.email, "role": user_data.role})
 
     return {
+        "message": "Đăng nhập thành công",
         "access_token": access_token,
         "token_type": "bearer"
     }

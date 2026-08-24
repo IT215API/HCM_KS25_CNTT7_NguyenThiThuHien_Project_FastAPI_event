@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, Any
-from fastapi import Request, HTTPException, status
+from fastapi import Request
 from datetime import datetime, timezone
 
 

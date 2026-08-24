@@ -17,11 +17,14 @@ app = FastAPI(
 app.include_router(auth_router.router)
 app.include_router(users_router.router)
 
+
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, global_exception_handler)
 
+
 Base.metadata.create_all(bind=engine)
+
 
 @app.get("/health")
 def health_check():
