@@ -8,7 +8,7 @@ from app.schemas.api_schema import success_response
 from app.dependencies.dependencies import get_current_user
 from app.schemas.event_schema import EventUpdate
 from app.schemas.event_staff_schema import EventMemberResponse
-import app.services.member_service as member_service
+# import app.services.member_service as member_service
 from app.models.user_model import UserModel
 from app.schemas.event_staff_schema import AddMemberSchema
 
@@ -169,7 +169,7 @@ def get_event_members(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    members = member_service.get_event_members(
+    members = event_service.get_event_members(
         db=db,
         event_id=event_id,
         current_user=current_user
