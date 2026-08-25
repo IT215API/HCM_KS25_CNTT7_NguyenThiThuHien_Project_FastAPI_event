@@ -219,6 +219,12 @@ def remove_member_from_event(
         raise HTTPException(
             status_code=403, detail="Chỉ OWNER mới có quyền xóa thành viên")
 
+    if user_id == current_user.id:
+        raise HTTPException(
+            status_code=400,
+            detail="Bạn không thể tự xóa chính mình khỏi sự kiện"
+        )
+
     target_member = db.query(EventStaffModel).filter(
         EventStaffModel.event_id == event_id,
         EventStaffModel.user_id == user_id
