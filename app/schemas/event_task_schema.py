@@ -20,8 +20,8 @@ class EventTaskUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     assignee_id: int | None = None
-    status: str | None = None
-    priority: str | None = None
+    status: Status | None = None
+    priority: Priority | None = None
     due_date: datetime | None = None
 
 
