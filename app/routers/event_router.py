@@ -194,14 +194,14 @@ def create_task(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
-    task_data = event_task_service.create_event_task(
+    task_data = event_service.create_event_task(
         event_id=event_id,
         event_task_in=event_task_in,
         db=db,
         current_user=current_user
     )
 
-    task_response = EventTaskResponse.model_validate(task_data).model_dump()
+    task_response = EventTaskResponse.model_validate(task_data).model_dump(mode="json")
 
     return success_response(
         data=task_response,
@@ -217,14 +217,13 @@ def get_tasks(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
-    tasks = event_task_service.get_event_tasks(
+    tasks = event_service.get_event_tasks(
         event_id=event_id,
         db=db,
         current_user=current_user
     )
 
-    tasks_response = [EventTaskResponse.model_validate(
-        task).model_dump() for task in tasks]
+    tasks_response = [EventTaskResponse.model_validate(task).model_dump(mode="json") for task in tasks]
 
     return success_response(
         data=tasks_response,

@@ -295,15 +295,17 @@ def create_event_task(
     if event_task_in.assignee_id is not None and event_task_in.assignee_id <= 0:
         event_task_in.assignee_id = None
 
-    event = db.query(EventModel).filter(EventModel.id == event_id).first()
-    if not event:
-        raise HTTPException(status_code=404, detail="Sự kiện không tồn tại")
-
     is_member = db.query(EventStaffModel).filter(
         EventStaffModel.event_id == event_id,
         EventStaffModel.user_id == current_user.id
     ).first()
+
     if not is_member:
+        event_exists = db.query(EventModel.id).filter(
+            EventModel.id == event_id).first()
+        if not event_exists:
+            raise HTTPException(
+                status_code=404, detail="Sự kiện không tồn tại")
         raise HTTPException(
             status_code=403, detail="Bạn không phải thành viên của sự kiện này")
 
@@ -340,22 +342,21 @@ def get_event_tasks(
     db: Session,
     current_user: UserModel
 ):
-    event = db.query(EventModel).filter(EventModel.id == event_id).first()
-    if not event:
-        raise HTTPException(status_code=404, detail="Sự kiện không tồn tại")
-
     is_member = db.query(EventStaffModel).filter(
         EventStaffModel.event_id == event_id,
         EventStaffModel.user_id == current_user.id
     ).first()
+
     if not is_member:
+        event_exists = db.query(EventModel.id).filter(EventModel.id == event_id).first()
+        if not event_exists:
+            raise HTTPException(
+                status_code=404, detail="Sự kiện không tồn tại")
         raise HTTPException(
             status_code=403,
             detail="Bạn không có quyền xem danh sách công việc của sự kiện này"
         )
 
-    tasks = db.query(EventTaskModel).filter(
-        EventTaskModel.event_id == event_id
-    ).all()
+    tasks = db.query(EventTaskModel).filter(EventTaskModel.event_id == event_id).all()
 
     return tasks
