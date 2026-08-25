@@ -36,6 +36,9 @@ def update_event_task(
     db: Session,
     current_user: UserModel
 ):
+    if event_task_in.assignee_id is not None and event_task_in.assignee_id <= 0:
+        event_task_in.assignee_id = None
+
     task = db.query(EventTaskModel).filter(EventTaskModel.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Công việc không tồn tại")
@@ -65,7 +68,7 @@ def update_event_task(
             )
     
     if is_owner and event_task_in.assignee_id is not None:
-        if event_task_in.assignee_id > 0:
+        if event_task_in.assignee_id:
             is_assignee_member = db.query(EventStaffModel).filter(
                 EventStaffModel.event_id == task.event_id,
                 EventStaffModel.user_id == event_task_in.assignee_id

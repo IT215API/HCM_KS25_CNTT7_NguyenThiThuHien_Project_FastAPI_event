@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.dependencies.dependencies import get_current_user
 from app.models.event_model import EventModel
 from app.models.user_model import UserModel
-from app.models.event_staff_model import EventStaffModel
+from app.models.event_staff_model import EventStaffModel, Role
 from app.schemas.event_schema import EventUpdate, EventResponse
 from app.schemas.event_staff_schema import AddMemberSchema
 from app.schemas.event_task_schema import EventTaskCreate
@@ -50,7 +50,7 @@ def create_event(
     staff_member = EventStaffModel(
         event_id=new_event.id,
         user_id=current_user.id,
-        role="OWNER"
+        role=Role.OWNER
     )
     db.add(staff_member)
     db.commit()
@@ -285,16 +285,13 @@ def get_event_members(
 
     return members
 
-
+# công việc sự kiện
 def create_event_task(
     event_id: int,
     event_task_in: EventTaskCreate,
     db: Session,
     current_user: UserModel
 ):
-    if event_task_in.assignee_id is not None and event_task_in.assignee_id <= 0:
-        event_task_in.assignee_id = None
-
     is_member = db.query(EventStaffModel).filter(
         EventStaffModel.event_id == event_id,
         EventStaffModel.user_id == current_user.id
@@ -308,6 +305,16 @@ def create_event_task(
                 status_code=404, detail="Sự kiện không tồn tại")
         raise HTTPException(
             status_code=403, detail="Bạn không phải thành viên của sự kiện này")
+
+    is_owner = (is_member.role == Role.OWNER)
+    if not is_owner:
+        raise HTTPException(
+            status_code=403,
+            detail="Chỉ Trưởng ban tổ chức (Owner) mới có quyền tạo công việc"
+        )
+
+    if event_task_in.assignee_id is not None and event_task_in.assignee_id <= 0:
+            event_task_in.assignee_id = None
 
     if event_task_in.assignee_id:
         is_assignee_member = db.query(EventStaffModel).filter(
@@ -340,8 +347,23 @@ def create_event_task(
 def get_event_tasks(
     event_id: int,
     db: Session,
-    current_user: UserModel
+    current_user: UserModel,
+    search: str | None = None,
+    status: str | None = None,
+    priority: str | None = None,
+    assignee_id: int | None = None,
+    limit: int = 10,
+    offset: int = 0,
+    sort_by: str = "created_at",
+    order: str = "desc"
 ):
+    if assignee_id is not None and assignee_id <= 0:
+        assignee_id = None
+    if limit <= 0:
+        limit = 10
+    if offset < 0:
+        offset = 0
+
     is_member = db.query(EventStaffModel).filter(
         EventStaffModel.event_id == event_id,
         EventStaffModel.user_id == current_user.id
@@ -357,6 +379,33 @@ def get_event_tasks(
             detail="Bạn không có quyền xem danh sách công việc của sự kiện này"
         )
 
-    tasks = db.query(EventTaskModel).filter(EventTaskModel.event_id == event_id).all()
+    query = db.query(EventTaskModel).filter(EventTaskModel.event_id == event_id)
 
-    return tasks
+    if search is not None:
+        search_clean = search.strip()
+        if search_clean:
+            query = query.filter(EventTaskModel.title.ilike(f"%{search_clean}%"))
+
+    if status is not None:
+        query = query.filter(EventTaskModel.status == status)
+
+    if priority is not None:
+        query = query.filter(EventTaskModel.priority == priority)
+
+    if assignee_id is not None:
+        query = query.filter(EventTaskModel.assignee_id == assignee_id)
+
+    if sort_by == "due_date":
+        if order.lower() == "asc":
+            query = query.order_by(EventTaskModel.due_date.asc())
+        else:
+            query = query.order_by(EventTaskModel.due_date.desc())
+    else:
+        if order.lower() == "asc":
+            query = query.order_by(EventTaskModel.created_at.asc())
+        else:
+            query = query.order_by(EventTaskModel.created_at.desc())
+
+    query = query.offset(offset).limit(limit)
+
+    return query.all()

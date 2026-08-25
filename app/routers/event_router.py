@@ -27,7 +27,8 @@ def create_event(
     current_user=Depends(get_current_user)
 ):
     event_data = event_service.create_event(event, db, current_user)
-    event_response = EventResponse.model_validate(event_data).model_dump()
+    event_response = EventResponse.model_validate(
+        event_data).model_dump(mode="json")
     return success_response(
         data=event_response,
         message="Tạo sự kiện thành công",
@@ -44,7 +45,7 @@ def get_user_events(
 ):
     events = event_service.get_user_events(db, current_user, search)
 
-    event_list = [EventResponse.model_validate(e).model_dump() for e in events]
+    event_list = [EventResponse.model_validate(e).model_dump(mode="json") for e in events]
 
     return success_response(
         request=request,
@@ -62,7 +63,7 @@ def get_event_by_id(
 ):
     event = event_service.get_event_by_id(db, event_id, current_user)
 
-    event_data = EventResponse.model_validate(event).model_dump()
+    event_data = EventResponse.model_validate(event).model_dump(mode="json")
 
     return success_response(
         request=request,
@@ -86,7 +87,7 @@ def update_event_owner(
         current_user=current_user
     )
 
-    event_data = EventResponse.model_validate(updated_event).model_dump()
+    event_data = EventResponse.model_validate(updated_event).model_dump(mode="json")
 
     return success_response(
         request=request,
@@ -184,7 +185,7 @@ def get_event_members(
         message="Lấy danh sách thành viên thành công"
     )
 
-
+# công việc sự kiện
 @router.post("/{event_id}/event-tasks", status_code=201)
 def create_task(
     event_id: int,
@@ -213,13 +214,29 @@ def create_task(
 def get_tasks(
     event_id: int,
     request: Request,
+    search: str | None = None,
+    status: str | None = None,
+    priority: str | None = None,
+    assignee_id: int | None = None,
+    limit: int = 10,
+    offset: int = 0,
+    sort_by: str = "created_at",
+    order: str = "desc",
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
     tasks = event_service.get_event_tasks(
         event_id=event_id,
         db=db,
-        current_user=current_user
+        current_user=current_user,
+        search=search,
+        status=status,
+        priority=priority,
+        assignee_id=assignee_id,
+        limit=limit,
+        offset=offset,
+        sort_by=sort_by,
+        order=order
     )
 
     tasks_response = [EventTaskResponse.model_validate(task).model_dump(mode="json") for task in tasks]
