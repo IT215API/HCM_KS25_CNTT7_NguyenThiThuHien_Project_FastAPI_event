@@ -11,7 +11,6 @@ from app.schemas.event_staff_schema import EventMemberResponse
 from app.models.user_model import UserModel
 from app.schemas.event_staff_schema import AddMemberSchema
 from app.schemas.event_task_schema import EventTaskCreate, EventTaskResponse
-from app.services import event_task_service
 
 
 router = APIRouter(
