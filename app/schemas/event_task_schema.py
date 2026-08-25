@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
-from app.models.event_task import Status, Priority
+from app.models.event_task_model import Status, Priority
 
 
 class EventTaskBase(BaseModel):
@@ -13,7 +13,7 @@ class EventTaskBase(BaseModel):
 
 
 class EventTaskCreate(EventTaskBase):
-    assignee_id: int | None = None
+    assignee_id: Optional[int] = None
 
 
 class EventTaskUpdate(BaseModel):
@@ -25,7 +25,7 @@ class EventTaskUpdate(BaseModel):
     due_date: datetime | None = None
 
 
-class EventTaskResponse(BaseModel):
+class EventTaskResponse(EventTaskBase):
     id: int
     event_id: int
     assignee_id: int | None = None

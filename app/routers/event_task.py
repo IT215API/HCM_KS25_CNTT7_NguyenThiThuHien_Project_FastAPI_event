@@ -1,1 +1,0 @@
-# Công việc sự kiện endpoints

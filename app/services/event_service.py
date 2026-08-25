@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.dependencies.dependencies import get_current_user
 from app.models.event_model import EventModel
 from app.models.user_model import UserModel
-from app.models.event_staff import EventStaffModel
+from app.models.event_staff_model import EventStaffModel
 from app.schemas.event_schema import EventUpdate, EventResponse
 from app.schemas.event_staff_schema import AddMemberSchema
 
