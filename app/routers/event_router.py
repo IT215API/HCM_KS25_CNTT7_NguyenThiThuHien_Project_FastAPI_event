@@ -9,6 +9,8 @@ from app.dependencies.dependencies import get_current_user
 from app.schemas.event_schema import EventUpdate
 from app.schemas.event_staff_schema import EventMemberResponse
 import app.services.member_service as member_service
+from app.models.user_model import UserModel
+from app.schemas.event_staff_schema import AddMemberSchema
 
 
 router = APIRouter(
@@ -25,7 +27,7 @@ def create_event(
     current_user=Depends(get_current_user)
 ):
     event_data = event_service.create_event(event, db, current_user)
-    event_response = EventResponse.model_validate(event_data)
+    event_response = EventResponse.model_validate(event_data).model_dump()
     return success_response(
         data=event_response,
         message="Tạo sự kiện thành công",
@@ -92,6 +94,7 @@ def update_event_owner(
         message="Cập nhật sự kiện thành công"
     )
 
+
 @router.delete("/{event_id}", status_code=200)
 def delete_event_owner(
     event_id: int,
@@ -112,6 +115,53 @@ def delete_event_owner(
     )
 
 
+
+@router.post("/{event_id}/members", status_code=201)
+def add_member(
+    event_id: int,
+    payload: AddMemberSchema,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user)
+):
+    member_data = event_service.add_member_to_event(
+        event_id=event_id,
+        payload=payload,
+        db=db,
+        current_user=current_user
+    )
+
+    response_data = EventMemberResponse.model_validate(member_data).model_dump()
+
+    return success_response(
+        data=response_data,
+        message="Thêm thành viên thành công",
+        request=request
+    )
+
+
+@router.delete("/{event_id}/members/{user_id}", status_code=200)
+def remove_member(
+    event_id: int,
+    user_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user)
+):
+    event_service.remove_member_from_event(
+        event_id=event_id,
+        user_id=user_id,
+        db=db,
+        current_user=current_user
+    )
+
+    return success_response(
+        data=None,
+        message="Xóa thành viên khỏi sự kiện thành công",
+        request=request
+    )
+
+
 @router.get("/{event_id}/members", status_code=200)
 def get_event_members(
     event_id: int,
@@ -125,7 +175,8 @@ def get_event_members(
         current_user=current_user
     )
 
-    members_data = [EventMemberResponse.model_validate(m).model_dump()for m in members]
+    members_data = [EventMemberResponse.model_validate(
+        m).model_dump() for m in members]
 
     return success_response(
         request=request,
