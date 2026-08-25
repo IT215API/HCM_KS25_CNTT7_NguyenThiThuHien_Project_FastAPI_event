@@ -99,3 +99,36 @@ def update_event_task(
     db.refresh(task)
 
     return task
+
+
+def delete_event_task(
+    task_id: int,
+    db: Session,
+    current_user: UserModel
+):
+    task = db.query(EventTaskModel).filter(
+        EventTaskModel.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Công việc không tồn tại")
+
+    staff_member = db.query(EventStaffModel).filter(
+        EventStaffModel.event_id == task.event_id,
+        EventStaffModel.user_id == current_user.id
+    ).first()
+
+    if not staff_member:
+        raise HTTPException(
+            status_code=403, detail="Bạn không thuộc sự kiện này")
+
+    is_owner = (staff_member.role == Role.OWNER)
+
+    if not is_owner:
+        raise HTTPException(
+            status_code=403,
+            detail="Chỉ Trưởng ban tổ chức (Owner) mới có quyền xóa công việc này"
+        )
+
+    db.delete(task)
+    db.commit()
+
+    return True

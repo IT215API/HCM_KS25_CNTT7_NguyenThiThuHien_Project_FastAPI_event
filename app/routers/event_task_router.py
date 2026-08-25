@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.get("/event-tasks/{task_id}", status_code=200)
+@router.get("/{task_id}", status_code=200)
 def get_task_detail(
     task_id: int,
     request: Request,
@@ -39,7 +39,7 @@ def get_task_detail(
     )
 
 
-@router.patch("/event-tasks/{task_id}", status_code=200)
+@router.patch("/{task_id}", status_code=200)
 def update_task(
     task_id: int,
     event_task_in: EventTaskUpdate,
@@ -60,5 +60,25 @@ def update_task(
     return success_response(
         data=task_response,
         message="Cập nhật công việc sự kiện thành công",
+        request=request
+    )
+
+
+@router.delete("/{task_id}", status_code=200)
+def delete_task(
+    task_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user)
+):
+    event_task_service.delete_event_task(
+        task_id=task_id,
+        db=db,
+        current_user=current_user
+    )
+
+    return success_response(
+        data=None,
+        message="Xóa công việc sự kiện thành công",
         request=request
     )
