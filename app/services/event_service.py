@@ -306,15 +306,8 @@ def create_event_task(
         raise HTTPException(
             status_code=403, detail="Bạn không phải thành viên của sự kiện này")
 
-    is_owner = (is_member.role == Role.OWNER)
-    if not is_owner:
-        raise HTTPException(
-            status_code=403,
-            detail="Chỉ Trưởng ban tổ chức (Owner) mới có quyền tạo công việc"
-        )
-
     if event_task_in.assignee_id is not None and event_task_in.assignee_id <= 0:
-            event_task_in.assignee_id = None
+        event_task_in.assignee_id = current_user.id
 
     if event_task_in.assignee_id:
         is_assignee_member = db.query(EventStaffModel).filter(
