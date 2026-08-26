@@ -172,6 +172,12 @@ def add_member_to_event(
         raise HTTPException(
             status_code=403, detail="Chỉ OWNER mới có quyền thêm thành viên")
 
+    if payload.role and payload.role.upper() == "OWNER":
+        raise HTTPException(
+            status_code=400, 
+            detail="Mỗi sự kiện chỉ có duy nhất 1 OWNER. Không thể thêm OWNER mới."
+        )
+
     target_user = db.query(UserModel).filter(
         UserModel.id == payload.user_id).first()
     if not target_user:
