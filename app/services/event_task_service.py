@@ -36,6 +36,7 @@ def update_event_task(
     db: Session,
     current_user: UserModel
 ):
+    
     if event_task_in.assignee_id is not None and event_task_in.assignee_id <= 0:
         event_task_in.assignee_id = None
 

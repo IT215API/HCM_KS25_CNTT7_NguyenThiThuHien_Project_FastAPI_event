@@ -24,6 +24,9 @@ class EventTaskUpdate(BaseModel):
     priority: Priority | None = None
     due_date: datetime | None = None
 
+    class Config:
+        from_attributes = True
+
 
 class EventTaskResponse(EventTaskBase):
     id: int

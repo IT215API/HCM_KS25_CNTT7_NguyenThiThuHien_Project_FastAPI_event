@@ -1,5 +1,5 @@
 # Công việc sự kiện endpoints
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Body
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.user_model import UserModel
@@ -42,8 +42,8 @@ def get_task_detail(
 @router.patch("/{task_id}", status_code=200)
 def update_task(
     task_id: int,
-    event_task_in: EventTaskUpdate,
     request: Request,
+    event_task_in: EventTaskUpdate = Depends(),
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
